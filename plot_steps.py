@@ -55,16 +55,17 @@ else:
 # Sort by month_start
 dates = monthly_avg["month_start"]
 
-plt.figure(figsize=(12, 6), facecolor="#4C4C47")
+plt.figure(figsize=(12, 6), facecolor="#0D1117", num="Apple Step Count Visualizer")
 # Plot the line and points separately
-plt.plot(dates, monthly_avg["value"], linestyle="-", color="#C14953")
-scatter = plt.scatter(dates, monthly_avg["value"], color="#C14953", s=40, zorder=3)
-plt.title("Average Daily Step Count Per Month")
-plt.xlabel("Year")
-plt.ylabel("Average Daily Step Count")
+plt.plot(dates, monthly_avg["value"], linestyle="-", color="#58A6FF")
+scatter = plt.scatter(dates, monthly_avg["value"], color="#58A6FF", s=40, zorder=3)
+plt.title("Average Daily Step Count Per Month", color="#C9D1D9")
+plt.xlabel("Year", color="#C9D1D9")
+plt.ylabel("Average Daily Step Count", color="#C9D1D9")
 # Format y-axis ticks with commas
 ax = plt.gca()
-ax.set_facecolor("#2D2D2A")
+ax.set_facecolor("#161B22")
+ax.tick_params(colors="#8B949E")
 ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{int(x):,}'))
 # Set y-axis limits based on min and max of monthly averages
 min_steps = 0
@@ -79,14 +80,14 @@ if not monthly_avg.empty:
     year_starts = monthly_avg.groupby("year")['month_start'].min()
     # Skip the first year
     for year_start in year_starts.iloc[1:]:
-        plt.axvline(year_start, color="#C14953", linestyle="--", alpha=0.5)
+        plt.axvline(year_start, color="#30363D", linestyle="--", alpha=0.5)
     # Only include years with at least 3 months of data for the trend line
     months_per_year = monthly_avg.groupby("year")["month"].count().reset_index()
     valid_years = months_per_year[months_per_year["month"] >= 3]["year"]
     yearly_avg = monthly_avg[monthly_avg["year"].isin(valid_years)].groupby("year")["value"].mean().reset_index()
     yearly_avg["month_start"] = pd.to_datetime(yearly_avg["year"].astype(str) + '-01-01')
     if not yearly_avg.empty:
-        plt.plot(yearly_avg["month_start"], yearly_avg["value"], color="#C14953", linestyle="-", linewidth=2, marker="s", markersize=8, markerfacecolor="#C14953", markeredgecolor="#C14953", alpha=0.7, label="Yearly Trend")
+        plt.plot(yearly_avg["month_start"], yearly_avg["value"], color="#8B949E", linestyle="-", linewidth=2, marker="s", markersize=8, markerfacecolor="#8B949E", markeredgecolor="#8B949E", alpha=0.7, label="Yearly Trend")
 
 # Add labels for the highest and lowest points
 if not monthly_avg.empty:
@@ -105,15 +106,54 @@ if not monthly_avg.empty:
                      textcoords="offset points",
                      xytext=(0, y_offset),
                      ha='center', va=va,
-                     fontsize=8, fontweight='normal', color='#C14953')
+                     fontsize=8, fontweight='normal', color='#C9D1D9')
 
-# Add interactivity with mplcursors
-mplcursors.cursor(scatter, hover=True, highlight=True).connect(
-    "add", lambda sel: sel.annotation.set_text(
-        f"Month: {monthly_avg.iloc[int(sel.index)]['month_start'].strftime('%b %Y')}\n"
-        f"Avg Steps: {monthly_avg.iloc[int(sel.index)]['value']:,.0f}"
-    )
-)
+# Add interactivity with custom hover behavior
+fig = plt.gcf()
+ax = plt.gca()
+
+# Create annotation object but don't show it yet
+annot = ax.annotate("", xy=(0,0), xytext=(10,10),
+                    textcoords="offset points",
+                    bbox=dict(boxstyle="round,pad=0.5",
+                            facecolor="#161B22",
+                            edgecolor="#30363D",
+                            alpha=0.9),
+                    color="#C9D1D9",
+                    fontsize=9)
+annot.set_visible(False)
+
+def hover(event):
+    if event.inaxes == ax:
+        cont, ind = scatter.contains(event)
+        if cont:
+            pos = scatter.get_offsets()[ind["ind"][0]]
+            annot.xy = pos
+            
+            # Get the current x-axis limits
+            xlim = ax.get_xlim()
+            # Calculate the position relative to the x-axis range
+            x_range = xlim[1] - xlim[0]
+            x_pos = pos[0]
+            x_relative = (x_pos - xlim[0]) / x_range
+            
+            # If point is in the right 30% of the graph, flip the annotation to the left
+            if x_relative > 0.7:
+                annot.set_x(-10)  # Negative offset moves it to the left
+            else:
+                annot.set_x(10)   # Positive offset moves it to the right
+                
+            text = f"Month: {monthly_avg.iloc[ind['ind'][0]]['month_start'].strftime('%b %Y')}\n" \
+                   f"Avg Steps: {monthly_avg.iloc[ind['ind'][0]]['value']:,.0f}"
+            annot.set_text(text)
+            annot.set_visible(True)
+            fig.canvas.draw_idle()
+        else:
+            if annot.get_visible():
+                annot.set_visible(False)
+                fig.canvas.draw_idle()
+
+fig.canvas.mpl_connect("motion_notify_event", hover)
 
 plt.tight_layout()
 plt.show() 
