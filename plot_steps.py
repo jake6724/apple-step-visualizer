@@ -6,7 +6,7 @@ import matplotlib.ticker as mticker
 import mplcursors
 
 # Path to the sample data
-input_path = "C:/Users/JakeA/OneDrive/Documents/cursor_projects/AppleStepViewer/step_data.xml"
+input_path = "export.xml"
 
 # Parse the XML and extract step data
 records = []
