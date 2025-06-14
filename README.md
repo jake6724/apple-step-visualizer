@@ -1,13 +1,5 @@
 # Apple Step Count Visualizer
-<<<<<<< HEAD
-### Visualize step count data stored on an Apple product
-
-![Example graph](images/image-1.png)
-
-## How to Generate Visualization:
-1.
-=======
-![Example graph](images/image-1.png)
+![Example graph](images/image-2.png)
 
 ## How to Generate Visualization:
 ### 1. Export and Download Apple Health Data from iPhone
@@ -23,4 +15,3 @@
 - From the data you downloaded, copy the file found at export -> apple_health_export -> export.xml to this top level of the repository
 ### 4. Run the Script
 - From the command line and within the repository directory, run `python3 plot_steps.py`. The window should appear. 
->>>>>>> 82550b4403f172a8f573c8dedcf92d3f6f1986ae
