@@ -1,6 +1,4 @@
 # Apple Step Count Visualizer
-### Visualize Step Count Data Stored on an Apple Product
-
 ![Example graph](images/image-1.png)
 
 ## How to Generate Visualization:
