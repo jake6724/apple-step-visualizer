@@ -14,4 +14,4 @@
 ### 3. Insert the Data
 - From the data you downloaded, copy the file found at export -> apple_health_export -> export.xml to this top level of the repository
 ### 4. Run the Script
-- From the command line and within the repository directory, run `python3 plot_steps.py`. The window should appear. 
+- From the command line and within the repository directory, run `python3 plot_steps.py`.
